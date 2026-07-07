@@ -3,7 +3,7 @@ import { TIMES, TOURS, TRANSPORTATION } from '../data'
 import { CalendarIcon, ClockIcon, TourIcon, TransportIcon, SearchIcon } from './icons'
 import Calendar from './Calendar'
 import OptionList from './OptionList'
-import AccordionSection from './AccordionSection'
+import SectionTab from './SectionTab'
 
 const TABS = ['Public Tours', 'Private Tours']
 const MONTHS_SHORT = [
@@ -13,13 +13,13 @@ const MONTHS_SHORT = [
 
 export default function SearchCard() {
   const [tab, setTab] = useState('Public Tours')
-  const [openSections, setOpenSections] = useState({}) // all sections closed by default
+  const [open, setOpen] = useState(null) // 'date' | 'time' | 'tour' | 'transport' | null
   const [date, setDate] = useState({ day: 6, month: 9, year: 2022 })
   const [time, setTime] = useState('1:00 am')
   const [tour, setTour] = useState('Lucca Bike Tour')
   const [transport, setTransport] = useState('Minivan and Bus')
 
-  const toggle = (id) => setOpenSections((s) => ({ ...s, [id]: !s[id] }))
+  const toggle = (id) => setOpen((cur) => (cur === id ? null : id))
   const dateLabel = `${date.day} ${MONTHS_SHORT[date.month]} ${date.year}`
 
   const handleSearch = () => {
@@ -28,9 +28,9 @@ export default function SearchCard() {
   }
 
   return (
-    <div className="w-full max-w-xl rounded-2xl bg-white/95 shadow-2xl ring-1 ring-black/5 backdrop-blur">
+    <div className="w-full max-w-4xl rounded-2xl bg-white/95 shadow-2xl ring-1 ring-black/5 backdrop-blur">
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-gray-200 px-6 pt-4">
+      <div className="flex gap-6 border-b border-gray-200 px-5 pt-4 sm:px-6">
         {TABS.map((t) => {
           const active = tab === t
           return (
@@ -56,61 +56,75 @@ export default function SearchCard() {
         })}
       </div>
 
-      {/* Collapsible sections — all closed by default */}
-      <div className="px-6">
-        <AccordionSection
-          icon={CalendarIcon}
-          label="Date"
-          value={dateLabel}
-          open={!!openSections.date}
-          onToggle={() => toggle('date')}
-        >
-          <div className="rounded-lg border border-gray-200 p-3">
-            <Calendar selected={date} onSelect={setDate} />
+      <div className="p-5 sm:p-6">
+        {/* Horizontal row of section toggles + search button */}
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-[repeat(4,minmax(0,1fr))_auto] lg:items-center">
+          <SectionTab
+            icon={CalendarIcon}
+            label="Date"
+            value={dateLabel}
+            open={open === 'date'}
+            onClick={() => toggle('date')}
+          />
+          <SectionTab
+            icon={ClockIcon}
+            label="Time"
+            value={time}
+            open={open === 'time'}
+            onClick={() => toggle('time')}
+          />
+          <SectionTab
+            icon={TourIcon}
+            label="Tour"
+            value={tour}
+            open={open === 'tour'}
+            onClick={() => toggle('tour')}
+          />
+          <SectionTab
+            icon={TransportIcon}
+            label="Transportation"
+            value={transport}
+            open={open === 'transport'}
+            onClick={() => toggle('transport')}
+          />
+
+          <div className="flex justify-center sm:col-span-2 lg:col-span-1 lg:justify-start">
+            <button
+              type="button"
+              onClick={handleSearch}
+              aria-label="Search"
+              className="grid h-14 w-14 place-items-center rounded-xl bg-brand text-white shadow-lg shadow-brand/30 transition-all hover:bg-brand-dark hover:shadow-brand/40 active:scale-95"
+            >
+              <SearchIcon className="h-6 w-6" />
+            </button>
           </div>
-        </AccordionSection>
+        </div>
 
-        <AccordionSection
-          icon={ClockIcon}
-          label="Time"
-          value={time}
-          open={!!openSections.time}
-          onToggle={() => toggle('time')}
-        >
-          <OptionList items={TIMES} selected={time} onSelect={setTime} />
-        </AccordionSection>
-
-        <AccordionSection
-          icon={TourIcon}
-          label="Tour"
-          value={tour}
-          open={!!openSections.tour}
-          onToggle={() => toggle('tour')}
-        >
-          <OptionList items={TOURS} selected={tour} onSelect={setTour} />
-        </AccordionSection>
-
-        <AccordionSection
-          icon={TransportIcon}
-          label="Transportation"
-          value={transport}
-          open={!!openSections.transport}
-          onToggle={() => toggle('transport')}
-        >
-          <OptionList items={TRANSPORTATION} selected={transport} onSelect={setTransport} />
-        </AccordionSection>
-      </div>
-
-      {/* Search button */}
-      <div className="px-6 pb-6 pt-5">
-        <button
-          type="button"
-          onClick={handleSearch}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 font-medium text-white shadow-lg shadow-brand/30 transition-all hover:bg-brand-dark hover:shadow-brand/40 active:scale-[0.99]"
-        >
-          <SearchIcon className="h-5 w-5" />
-          Search
-        </button>
+        {/* Details of the open section appear inline below the row */}
+        {open && (
+          <div className="mt-5 border-t border-gray-200 pt-5">
+            {open === 'date' && (
+              <div className="max-w-xs rounded-lg border border-gray-200 p-3">
+                <Calendar selected={date} onSelect={setDate} />
+              </div>
+            )}
+            {open === 'time' && (
+              <div className="max-w-xs">
+                <OptionList items={TIMES} selected={time} onSelect={setTime} />
+              </div>
+            )}
+            {open === 'tour' && (
+              <div className="max-w-xs">
+                <OptionList items={TOURS} selected={tour} onSelect={setTour} />
+              </div>
+            )}
+            {open === 'transport' && (
+              <div className="max-w-xs">
+                <OptionList items={TRANSPORTATION} selected={transport} onSelect={setTransport} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
