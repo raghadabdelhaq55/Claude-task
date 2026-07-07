@@ -16,9 +16,10 @@ export default function Hero() {
       <div className="absolute inset-0 bg-gradient-to-b from-orange-900/40 via-black/45 to-black/60" />
       <div className="absolute inset-0 bg-orange-500/10 mix-blend-overlay" />
 
-      {/* Foreground content */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center px-4">
-        <div className="flex flex-1 flex-col items-center justify-center pt-28 text-center">
+      {/* Foreground content — heading + card centered as a group so the
+          section popovers have room to open below the card. */}
+      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center gap-10 px-4 py-28">
+        <div className="text-center">
           <h1 className="font-script text-5xl text-brand drop-shadow-lg sm:text-6xl md:text-7xl">
             Enjoy in the best way!
           </h1>
@@ -27,11 +28,8 @@ export default function Hero() {
           </p>
         </div>
 
-        {/* Floating search card overlapping the bottom of the hero */}
-        <div className="w-full max-w-6xl -translate-y-2 px-2 pb-10 sm:pb-16">
-          <div className="flex justify-center">
-            <SearchCard />
-          </div>
+        <div className="flex w-full max-w-6xl justify-center px-2">
+          <SearchCard />
         </div>
       </div>
     </section>
