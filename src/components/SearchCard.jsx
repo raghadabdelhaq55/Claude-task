@@ -1,17 +1,26 @@
 import { useState } from 'react'
 import { TIMES, TOURS, TRANSPORTATION } from '../data'
-import { ClockIcon, TourIcon, TransportIcon, SearchIcon } from './icons'
+import { CalendarIcon, ClockIcon, TourIcon, TransportIcon, SearchIcon } from './icons'
 import Calendar from './Calendar'
-import OptionColumn from './OptionColumn'
+import OptionList from './OptionList'
+import AccordionSection from './AccordionSection'
 
 const TABS = ['Public Tours', 'Private Tours']
+const MONTHS_SHORT = [
+  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+]
 
 export default function SearchCard() {
   const [tab, setTab] = useState('Public Tours')
+  const [openSections, setOpenSections] = useState({}) // all sections closed by default
   const [date, setDate] = useState({ day: 6, month: 9, year: 2022 })
   const [time, setTime] = useState('1:00 am')
   const [tour, setTour] = useState('Lucca Bike Tour')
   const [transport, setTransport] = useState('Minivan and Bus')
+
+  const toggle = (id) => setOpenSections((s) => ({ ...s, [id]: !s[id] }))
+  const dateLabel = `${date.day} ${MONTHS_SHORT[date.month]} ${date.year}`
 
   const handleSearch = () => {
     // In a real app this would trigger a query; here we surface the selection.
@@ -19,9 +28,9 @@ export default function SearchCard() {
   }
 
   return (
-    <div className="w-full max-w-5xl rounded-2xl bg-white/95 shadow-2xl ring-1 ring-black/5 backdrop-blur">
+    <div className="w-full max-w-xl rounded-2xl bg-white/95 shadow-2xl ring-1 ring-black/5 backdrop-blur">
       {/* Tabs */}
-      <div className="flex gap-6 border-b border-gray-200 px-5 pt-4 sm:px-6">
+      <div className="flex gap-6 border-b border-gray-200 px-6 pt-4">
         {TABS.map((t) => {
           const active = tab === t
           return (
@@ -47,29 +56,61 @@ export default function SearchCard() {
         })}
       </div>
 
-      {/* Body: calendar + three option columns + search button */}
-      <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2 sm:p-6 lg:grid-cols-[1.3fr_0.8fr_1.1fr_1.1fr_auto]">
-        <Calendar selected={date} onSelect={setDate} />
-        <OptionColumn icon={ClockIcon} label="Time" items={TIMES} selected={time} onSelect={setTime} />
-        <OptionColumn icon={TourIcon} label="Tour" items={TOURS} selected={tour} onSelect={setTour} />
-        <OptionColumn
+      {/* Collapsible sections — all closed by default */}
+      <div className="px-6">
+        <AccordionSection
+          icon={CalendarIcon}
+          label="Date"
+          value={dateLabel}
+          open={!!openSections.date}
+          onToggle={() => toggle('date')}
+        >
+          <div className="rounded-lg border border-gray-200 p-3">
+            <Calendar selected={date} onSelect={setDate} />
+          </div>
+        </AccordionSection>
+
+        <AccordionSection
+          icon={ClockIcon}
+          label="Time"
+          value={time}
+          open={!!openSections.time}
+          onToggle={() => toggle('time')}
+        >
+          <OptionList items={TIMES} selected={time} onSelect={setTime} />
+        </AccordionSection>
+
+        <AccordionSection
+          icon={TourIcon}
+          label="Tour"
+          value={tour}
+          open={!!openSections.tour}
+          onToggle={() => toggle('tour')}
+        >
+          <OptionList items={TOURS} selected={tour} onSelect={setTour} />
+        </AccordionSection>
+
+        <AccordionSection
           icon={TransportIcon}
           label="Transportation"
-          items={TRANSPORTATION}
-          selected={transport}
-          onSelect={setTransport}
-        />
+          value={transport}
+          open={!!openSections.transport}
+          onToggle={() => toggle('transport')}
+        >
+          <OptionList items={TRANSPORTATION} selected={transport} onSelect={setTransport} />
+        </AccordionSection>
+      </div>
 
-        <div className="flex items-start justify-center sm:col-span-2 lg:col-span-1 lg:items-start">
-          <button
-            type="button"
-            onClick={handleSearch}
-            aria-label="Search"
-            className="grid h-14 w-14 place-items-center rounded-xl bg-brand text-white shadow-lg shadow-brand/30 transition-all hover:bg-brand-dark hover:shadow-brand/40 active:scale-95"
-          >
-            <SearchIcon className="h-6 w-6" />
-          </button>
-        </div>
+      {/* Search button */}
+      <div className="px-6 pb-6 pt-5">
+        <button
+          type="button"
+          onClick={handleSearch}
+          className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 font-medium text-white shadow-lg shadow-brand/30 transition-all hover:bg-brand-dark hover:shadow-brand/40 active:scale-[0.99]"
+        >
+          <SearchIcon className="h-5 w-5" />
+          Search
+        </button>
       </div>
     </div>
   )

@@ -19,7 +19,7 @@ export default function Hero() {
       {/* Foreground content */}
       <div className="relative z-10 flex min-h-screen flex-col items-center px-4">
         <div className="flex flex-1 flex-col items-center justify-center pt-28 text-center">
-          <h1 className="font-script text-5xl text-brand drop-shadow-md sm:text-6xl md:text-7xl">
+          <h1 className="font-script text-5xl text-brand drop-shadow-lg sm:text-6xl md:text-7xl">
             Enjoy in the best way!
           </h1>
           <p className="mt-3 text-base font-light tracking-wide text-white/90 sm:text-lg">
